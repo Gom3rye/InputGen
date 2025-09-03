@@ -1,36 +1,28 @@
-# .github/workflows/ci.yaml
+name: InputGenerator CI flow 
 
-name: CI/CD for Input Generator
-
-# 1. 언제 실행할 것인가?
-# main 브랜치에 코드가 Push될 때마다 실행
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  # 2. 어떤 작업을 할 것인가? (CI: 빌드하고 이미지 레지스트리에 Push)
-  build-and-push:
-    runs-on: ubuntu-latest # 작업은 ubuntu 환경에서 실행
-    
+  build:
+    runs-on: ubuntu-latest
     steps:
-      # (1) GitHub 저장소의 코드를 작업 환경으로 가져옴
-      - name: Checkout code
+
+      - name: checkout
         uses: actions/checkout@v3
 
-      # (2) Docker Hub에 로그인
-      # Docker Hub 사용자 이름과 토큰은 GitHub 저장소의 Secrets에 미리 저장해야 함
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
+      - name: Login to Dockerhub
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
-      # (3) Docker 이미지 빌드 및 Docker Hub에 Push
-      # 태그는 latest와 현재 커밋의 고유 ID, 두 가지로 지정하여 버전 관리
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/inputgen:latest, ${{ secrets.DOCKERHUB_USERNAME }}/inputgen:${{ github.sha }}
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_PASSWORD}}
+      
+      - name: Build and Push Docker Image
+        env:
+          NAME: ${{secrets.DOCKERHUB_USERNAME}}
+          REPO: input_generator
+        run: |
+          docker build -t $NAME/$REPO:latest .
+          docker push $NAME/$REPO:latest
