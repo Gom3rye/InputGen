@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 4. 소스 코드 복사
 COPY input_generator.py .
 
-# 5. 컨테이너 실행 시 사용할 포트 노출
+# 5. 컨테이너 실행 시 사용할 포트를 노출
 EXPOSE 8080
 
 # 6. 애플리케이션 실행
