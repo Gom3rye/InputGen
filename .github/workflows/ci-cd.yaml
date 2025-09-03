@@ -1,0 +1,62 @@
+# .github/workflows/ci-cd.yml
+
+name: CI/CD for Input Generator
+
+# 1. 언제 실행할 것인가?
+# main 브랜치에 코드가 Push될 때마다 실행
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # 2. 어떤 작업을 할 것인가? (CI: 빌드하고 이미지 레지스트리에 Push)
+  build-and-push:
+    runs-on: ubuntu-latest # 작업은 ubuntu 환경에서 실행
+    
+    steps:
+      # (1) GitHub 저장소의 코드를 작업 환경으로 가져옴
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # (2) Docker Hub에 로그인
+      # Docker Hub 사용자 이름과 토큰은 GitHub 저장소의 Secrets에 미리 저장해야 함
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      # (3) Docker 이미지 빌드 및 Docker Hub에 Push
+      # 태그는 latest와 현재 커밋의 고유 ID, 두 가지로 지정하여 버전 관리
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: your-dockerhub-username/my-log-generator:latest, your-dockerhub-username/my-log-generator:${{ github.sha }}
+
+  # 3. CD: Kubernetes에 자동 배포
+  deploy:
+    # build-and-push 작업이 성공해야만 실행됨
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    
+    steps:
+      # (1) 코드를 다시 가져옴 (쿠버네티스 설정 파일 등을 사용하기 위해)
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      # (2) Kubernetes 클러스터에 접속 설정
+      # 클러스터 접속 정보(kubeconfig)도 GitHub Secrets에 저장해야 함
+      - name: Set up Kubeconfig
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
+          
+      # (3) 새로운 이미지로 Deployment 업데이트
+      # my-log-generator 라는 이름의 deployment를 새로운 이미지로 교체
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/my-log-generator my-log-generator-container=your-dockerhub-username/my-log-generator:${{ github.sha }}
+          echo "Deployment updated successfully!"
