@@ -17,25 +17,35 @@ app = Flask(__name__)
 
 @app.route('/metrics')
 def metrics():
-    # (이 부분은 이전 코드와 동일)
+    """프로메테우스가 수집할 메트릭을 형식에 맞게 노출하는 엔드포인트"""
     metric_data = []
     metric_data.append('# HELP simulated_cpu_usage_percent The simulated CPU usage of the server.')
     metric_data.append('# TYPE simulated_cpu_usage_percent gauge')
     metric_data.append(f'simulated_cpu_usage_percent {simulated_cpu_usage}')
+    
+    metric_data.append('\n# HELP simulated_memory_usage_percent The simulated memory usage of the server.')
+    metric_data.append('# TYPE simulated_memory_usage_percent gauge')
+    metric_data.append(f'simulated_memory_usage_percent {simulated_memory_usage}')
+
     metric_data.append('\n# HELP failed_logins_total Total number of failed login attempts.')
     metric_data.append('# TYPE failed_logins_total counter')
     metric_data.append(f'failed_logins_total {failed_logins_total}')
-    # ... (다른 메트릭도 동일하게 추가) ...
+
+    metric_data.append('\n# HELP http_requests_total Total number of http requests.')
+    metric_data.append('# TYPE http_requests_total counter')
+    metric_data.append(f'http_requests_total {http_requests_total}')
+    
     return Response("\n".join(metric_data), mimetype='text/plain')
 
 def log_generator():
-    """백그라운드에서 계속해서 JSON 형식의 로그를 생성하는 함수입니다."""
+    """백그라운드에서 계속해서 JSON 형식의 로그를 생성하는 함수"""
     global simulated_cpu_usage, simulated_memory_usage, failed_logins_total, http_requests_total
     
     users = ["user-a", "user-b", "admin", "guest"]
     ips = ["192.168.1.10", "10.0.0.5", "172.16.0.8", "203.0.113.25"]
     
     while True:
+    	# 0.1초에서 1.5초 사이의 랜덤한 간격으로 로그 생성
         time.sleep(random.uniform(0.1, 1.5))
         
         log_type = random.choices(
@@ -73,11 +83,14 @@ def log_generator():
             log_entry.update({"level": "error", "message": "Database connection timeout"})
 
         # 최종 JSON 로그를 한 줄로 출력
-        # sys.stdout.flush()는 버퍼링 없이 즉시 출력되도록 보장합니다.
+        # sys.stdout.flush()는 버퍼링 없이 즉시 출력되도록 보장
         print(json.dumps(log_entry))
         sys.stdout.flush()
 
 if __name__ == '__main__':
+	# 로그 생성 스레드를 데몬으로 설정하여 메인 스레드 종료 시 함께 종료되도록 함
     log_thread = threading.Thread(target=log_generator, daemon=True)
     log_thread.start()
+    # Flask 웹 서버 실행 (메트릭 노출)
+    # host='0.0.0.0' 은 컨테이너 외부에서 접근 가능하도록 설정
     app.run(host='0.0.0.0', port=8080)
