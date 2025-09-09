@@ -22,7 +22,18 @@ jobs:
       - name: Build and Push Docker Image
         env:
           NAME: ${{secrets.DOCKERHUB_USERNAME}}
-          REPO: input_generator
         run: |
-          docker build -t $NAME/$REPO:latest .
-          docker push $NAME/$REPO:latest
+          docker build -t $NAME/inputgen0:latest Dockerfile0
+          docker push $NAME/inputgen0:latest
+
+          docker build -t $NAME/inputgen1:latest Dockerfile1
+          docker push $NAME/inputgen1:latest
+
+          docker build -t $NAME/inputgen2:latest Dockerfile2
+          docker push $NAME/inputgen2:latest
+
+          docker build -t $NAME/inputgen3:latest Dockerfile3
+          docker push $NAME/inputgen3:latest
+
+          docker build -t $NAME/inputgen4:latest Dockerfile4
+          docker push $NAME/inputgen4:latest
