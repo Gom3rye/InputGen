@@ -9,10 +9,18 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 4. 소스 코드 복사
-COPY input_generator.py .
+COPY service_inputgenerator1.py .
+COPY oom_inputgenerator2.py .
+COPY mce_inputgenerator3.py .
+COPY disk_inputgenerator4.py .
+COPY auth_inputgenerator5.py .
 
 # 5. 컨테이너 실행 시 사용할 포트를 노출
 EXPOSE 8080
 
 # 6. 애플리케이션 실행
-CMD ["python", "input_generator.py"]
+CMD ["python", "service_inputgenerator1.py"]
+CMD ["python", "oom_inputgenerator2.py"]
+CMD ["python", "mce_inputgenerator3.py"]
+CMD ["python", "disk_inputgenerator4.py"]
+CMD ["python", "auth_inputgenerator5.py"]
