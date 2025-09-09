@@ -23,17 +23,18 @@ jobs:
         env:
           NAME: ${{secrets.DOCKERHUB_USERNAME}}
         run: |
-          docker build -t $NAME/inputgen0:latest Dockerfile0
+          docker build -t $NAME/inputgen0:latest -f Dockerfile0 .
           docker push $NAME/inputgen0:latest
 
-          docker build -t $NAME/inputgen1:latest Dockerfile1
+          docker build -t $NAME/inputgen1:latest -f Dockerfile1 .
           docker push $NAME/inputgen1:latest
 
-          docker build -t $NAME/inputgen2:latest Dockerfile2
+          docker build -t $NAME/inputgen2:latest -f Dockerfile2 .
           docker push $NAME/inputgen2:latest
 
-          docker build -t $NAME/inputgen3:latest Dockerfile3
+          docker build -t $NAME/inputgen3:latest -f Dockerfile3 .
           docker push $NAME/inputgen3:latest
 
-          docker build -t $NAME/inputgen4:latest Dockerfile4
+          docker build -t $NAME/inputgen4:latest -f Dockerfile4 .
           docker push $NAME/inputgen4:latest
+
