@@ -38,3 +38,6 @@ jobs:
           docker build -t $NAME/inputgen4:latest -f Dockerfile4 .
           docker push $NAME/inputgen4:latest
 
+          docker build -t $NAME/inputgen5:latest -f Dockerfile5 .
+          docker push $NAME/inputgen5:latest
+
