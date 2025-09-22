@@ -11,4 +11,4 @@ COPY kmsg_inputgenerator5.py .
 EXPOSE 8080
 
 # 5. 애플리케이션 실행
-CMD ["python", "kmsg_inputgenerator5.py"]
+CMD ["python", "kmsg_inputgenerator6.py"]
