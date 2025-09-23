@@ -4,6 +4,7 @@ import time
 import random
 import sys
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 def generate_auth_log():
     """auth.log (sshd)와 유사한 포맷의 로그를 생성합니다."""
@@ -12,7 +13,7 @@ def generate_auth_log():
     ips = ["104.28.231.109", "10.0.1.100", "211.34.56.78", "192.168.1.1"]
     hostname = "prod-bastion-01"
     pid = random.randint(10000, 20000)
-    ts = datetime.now().strftime('%b %d %H:%M:%S')
+    ts = datetime.now(ZoneInfo("Asia/Seoul")).isoformat()
 
     # 70%는 성공, 30%는 실패
     if random.random() > 0.3:
