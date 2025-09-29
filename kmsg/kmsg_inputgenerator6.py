@@ -1,4 +1,4 @@
-# kmsg_inputgen_metrics.py
+# kmsg_inputgenerator6.py
 
 import json
 import random
@@ -6,9 +6,13 @@ import socket
 import time
 import sys
 import threading
-from prometheus_client import Counter, generate_latest
+from prometheus_client import Counter, generate_latest, REGISTRY
 from fastapi import FastAPI, Response
 import uvicorn
+
+MIN_TERM = 0.5
+MAX_TERM = 2.0
+
 
 # ✅ Prometheus 메트릭 정의
 kmsg_total = Counter(
@@ -16,10 +20,6 @@ kmsg_total = Counter(
     'Total number of kernel/system logs generated',
     ['priority']
 )
-
-MIN_TERM = 0.5
-MAX_TERM = 2.0
-
 PRIORITY_MAP = {
     0: "emerg",
     1: "alert",
@@ -50,7 +50,7 @@ app = FastAPI()
 
 @app.get("/metrics")
 def metrics():
-    return Response(generate_latest(), media_type="text/plain")
+    return Response(generate_latest(REGISTRY), media_type="text/plain")
 
 
 def generate_log(seq):
