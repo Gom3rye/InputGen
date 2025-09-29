@@ -5,7 +5,7 @@ import time
 import random
 import sys
 from datetime import datetime, timezone, timedelta
-from prometheus_client import Counter, Histogram, generate_latest
+from prometheus_client import Counter, Histogram, generate_latest, REGISTRY
 from fastapi import FastAPI, Response
 import threading
 import uvicorn
@@ -27,7 +27,7 @@ app = FastAPI()
 
 @app.get("/metrics")
 def metrics():
-    return Response(generate_latest(), media_type="text/plain")
+    return Response(generate_latest(REGISTRY), media_type="text/plain")
 
 
 def generate_http_request_log():
