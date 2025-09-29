@@ -32,7 +32,7 @@ def metrics():
 
 def generate_http_request_log():
     """HTTP 요청 로그 생성 + 메트릭 업데이트"""
-    apis = ["/api/v1/users", "/api/v1/products", "/api/v1/orders", "/health"]
+    apis = ["/api/solog/users", "/api/solog/products", "/api/solog/orders", "/health"]
     status_code = random.choices([200, 404, 502], weights=[0.95, 0.03, 0.02])[0]
     api = random.choice(apis)
 
