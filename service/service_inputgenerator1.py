@@ -1,14 +1,17 @@
-# service_inputgen_metrics.py
+# service_inputgenerator1.py
 
 import json
 import time
 import random
 import sys
 from datetime import datetime, timezone, timedelta
-from prometheus_client import Counter, Histogram, generate_latest, REGISTRY
+from prometheus_client import Counter, Histogram, generate_latest
 from fastapi import FastAPI, Response
 import threading
 import uvicorn
+
+MAX_TERM, MIN_TERM = 1, 3
+RATE_SUCCESS, RATE_WARN, RATE_ERR = 0.95, 0.03, 0.02
 
 # ✅ Prometheus 메트릭 정의
 http_requests_total = Counter(
@@ -27,13 +30,13 @@ app = FastAPI()
 
 @app.get("/metrics")
 def metrics():
-    return Response(generate_latest(REGISTRY), media_type="text/plain")
+    return Response(generate_latest(), media_type="text/plain")
 
 
 def generate_http_request_log():
     """HTTP 요청 로그 생성 + 메트릭 업데이트"""
-    apis = ["/api/solog/users", "/api/solog/products", "/api/solog/orders", "/health"]
-    status_code = random.choices([200, 404, 502], weights=[0.95, 0.03, 0.02])[0]
+    apis = ["/api/v1/users", "/api/v1/products", "/api/v1/orders", "/health"]
+    status_code = random.choices([200, 404, 502], weights=[RATE_SUCCESS, RATE_WARN, RATE_ERR])[0]
     api = random.choice(apis)
 
     # 📊 메트릭 업데이트
@@ -52,7 +55,7 @@ def generate_http_request_log():
 
 def log_loop():
     while True:
-        time.sleep(random.uniform(1.0, 3.0))
+        time.sleep(random.uniform(MAX_TERM, MIN_TERM))
         log = generate_http_request_log()
         print(json.dumps(log))
         sys.stdout.flush()
