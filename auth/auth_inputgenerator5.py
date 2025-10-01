@@ -3,12 +3,15 @@
 import time
 import random
 import sys
-import socket
+import os
 from datetime import datetime, timezone, timedelta
 import threading
 from prometheus_client import Counter, generate_latest, REGISTRY
 from fastapi import FastAPI, Response
 import uvicorn
+
+# ✅ 노드 이름을 환경 변수에서 읽어옴 (Downward API로 주입됨)
+HOST = os.getenv("NODE_NAME", "unknown-node")
 
 RATE_HACKING_ATTEMPT = 0.1
 MIN_INTERVAL, MAX_INTERVAL = 1, 10
@@ -31,7 +34,6 @@ def generate_single_auth_log(result="success", ip=None):
     """단일 로그를 생성하는 함수"""
     users = ["root", "admin", "kyla", "lnaura", "yes-ee", "guest", "chu", "leeejjju", "hoit"]
     ips = ["104.28.231.109", "10.0.1.100", "211.34.56.78", "192.168.1.1"]
-    hostname = socket.gethostname()
     pid = random.randint(10000, 20000)
     ts = datetime.now(timezone(timedelta(hours=9)))
 
@@ -48,7 +50,7 @@ def generate_single_auth_log(result="success", ip=None):
     # 📊 메트릭 업데이트
     auth_attempts_total.labels(result=result).inc()
 
-    return f"{ts} {hostname} sshd[{pid}]: {message}"
+    return f"{ts} {HOST} sshd[{pid}]: {message}"
 
 
 def generate_auth_log_batch():
