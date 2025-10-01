@@ -2,7 +2,7 @@
 
 import json
 import random
-import socket
+import os
 import time
 import sys
 import threading
@@ -13,6 +13,8 @@ import uvicorn
 MIN_TERM = 0.5
 MAX_TERM = 2.0
 
+# ✅ 환경 변수에서 노드 이름을 읽어옵니다.
+HOST = os.getenv("NODE_NAME", "unknown-node")
 
 # ✅ Prometheus 메트릭 정의
 kmsg_total = Counter(
@@ -66,7 +68,7 @@ def generate_log(seq):
         "seq": seq,
         "timestamp": f"{time.monotonic():.6f}",
         "message": message,
-        "host": socket.gethostname()
+        "host": HOST # 노드 이름만 출력
     }
     return log
 
