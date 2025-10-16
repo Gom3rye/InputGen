@@ -65,7 +65,7 @@ def generate_auth_log_batch():
         return logs
     else:
         # 기존 단일 로그 출력
-        result = "success" if random.random() > 0.3 else "failed"
+        result = "success" if random.random() > 0.1 else "failed"
         return [generate_single_auth_log(result=result)]
 
 
