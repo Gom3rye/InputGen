@@ -10,8 +10,8 @@ from prometheus_client import Counter, generate_latest, REGISTRY
 from fastapi import FastAPI, Response
 import uvicorn
 
-MIN_TERM = 0.5
-MAX_TERM = 2.0
+MIN_TERM = 5
+MAX_TERM = 10
 
 # ✅ 환경 변수에서 노드 이름을 읽어옵니다.
 HOST = os.getenv("NODE_NAME", "unknown-node")
@@ -34,7 +34,8 @@ PRIORITY_MAP = {
 }
 
 PRIORITY_WEIGHTS = {
-    0: 1, 1: 2, 2: 3, 3: 5, 4: 10, 5: 15, 6: 30, 7: 10
+    # 0: 1, 1: 2, 2: 3, 3: 5, 4: 10, 5: 15, 6: 30, 7: 10
+    0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1 # 테스트 후 메일 많이 안 보내도록
 }
 
 MESSAGE_TEMPLATES = {
